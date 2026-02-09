@@ -1,0 +1,7 @@
+{
+  "name": "Sovereign Edge AI Platform",
+  "description": "Enterprise-grade, zero-cloud edge AI cluster management for Raspberry Pi 5. Autonomous inference, federated learning, and P2P mesh distribution.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
