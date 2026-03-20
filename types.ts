@@ -1,4 +1,17 @@
 
+export interface PrometheusMetric {
+  metric: Record<string, string>;
+  value: [number, string];
+}
+
+export interface PrometheusResponse {
+  status: string;
+  data: {
+    resultType: string;
+    result: PrometheusMetric[];
+  };
+}
+
 export interface NodeStats {
   id: string;
   name: string;
@@ -97,6 +110,7 @@ export enum AppTab {
   INFERENCE = 'inference',
   FEDERATED = 'federated_learning',
   MARKETPLACE = 'marketplace',
+  TOPOLOGY = 'topology',
   P2P = 'p2p_sync',
   VIDEO = 'video_analytics',
   AUTOMATION = 'edge_automation',
