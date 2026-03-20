@@ -25,12 +25,15 @@ export interface NodeStats {
   ip: string;
   meshIp: string;
   encrypted: boolean;
+  ramTotal: number; // in GB
+  ramUsed: number; // in GB
 }
 
 export interface InferenceMetric {
   timestamp: string;
   latency: number;
   throughput: number;
+  activeModels: number;
 }
 
 export interface LocalModel {

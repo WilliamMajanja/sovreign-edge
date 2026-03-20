@@ -242,7 +242,7 @@ const App: React.FC = () => {
   const handleRunAudit = async () => {
     setIsAnalyzing(true);
     addLog("Executing Advanced Structural Audit...");
-    const result = await analyzeClusterHealth({ nodes, models, fedRounds, clients }, logs);
+    const result = await analyzeClusterHealth({ nodes, models, fedRounds, clients, inferenceStats }, logs);
     setAiInsights(result);
     setIsAnalyzing(false);
     addLog("Sovereign Audit Complete.");
@@ -359,7 +359,7 @@ const App: React.FC = () => {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            {activeTab === AppTab.DASHBOARD && <DashboardTab nodes={nodes} fedRounds={fedRounds} addLog={addLog} setActiveTab={setActiveTab} />}
+            {activeTab === AppTab.DASHBOARD && <DashboardTab nodes={nodes} fedRounds={fedRounds} addLog={addLog} setActiveTab={setActiveTab} inferenceStats={inferenceStats} />}
             {activeTab === AppTab.NODES && <NodesTab nodes={nodes} openTerminal={openTerminal} addNotification={addNotification} setNodes={setNodes} />}
             {activeTab === AppTab.TOPOLOGY && <TopologyTab nodes={nodes} />}
             {activeTab === AppTab.OPENCLAW && <OpenClawTab addLog={addLog} setNodes={setNodes} />}
@@ -611,6 +611,8 @@ const OpenClawTab: React.FC<{ addLog: (msg: string) => void; setNodes: React.Dis
             status: 'Online',
             cpuUsage: Math.floor(Math.random() * 30) + 10,
             memoryUsage: Math.floor(Math.random() * 40) + 20,
+            ramTotal: 16,
+            ramUsed: 4 + Math.random() * 4,
             temp: Math.floor(Math.random() * 20) + 40,
             nvmeStatus: 'Active',
             uptime: '0d 0h',
@@ -641,6 +643,8 @@ const OpenClawTab: React.FC<{ addLog: (msg: string) => void; setNodes: React.Dis
             status: 'Online',
             cpuUsage: Math.floor(Math.random() * 30) + 10,
             memoryUsage: Math.floor(Math.random() * 40) + 20,
+            ramTotal: 16,
+            ramUsed: 4 + Math.random() * 4,
             temp: Math.floor(Math.random() * 20) + 40,
             nvmeStatus: 'Active',
             uptime: '0d 0h',
@@ -825,13 +829,13 @@ const TopologyTab: React.FC<{ nodes: NodeStats[] }> = ({ nodes }) => {
   );
 };
 
-const DashboardTab: React.FC<{ nodes: NodeStats[]; fedRounds: FederatedRound[]; addLog: (m: string) => void; setActiveTab: (t: AppTab) => void }> = ({ nodes, fedRounds, addLog, setActiveTab }) => (
+const DashboardTab: React.FC<{ nodes: NodeStats[]; fedRounds: FederatedRound[]; addLog: (m: string) => void; setActiveTab: (t: AppTab) => void; inferenceStats: any }> = ({ nodes, fedRounds, addLog, setActiveTab, inferenceStats }) => (
   <div className="space-y-6 animate-in fade-in duration-500">
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <StatCard title="Mesh Nodes" value={`${nodes.filter(n => n.status === 'Online').length} / ${nodes.length}`} icon={<Cpu />} subtitle="Active & Sovereign" />
-      <StatCard title="Storage (RAID)" value="2.1 TB" icon={<HardDrive />} subtitle="NVMe Enterprise Grade" />
+      <StatCard title="Inference Vol" value={inferenceStats ? `${inferenceStats.totalInferences.toFixed(1)}/s` : '0.0/s'} icon={<Zap />} subtitle="Local ONNX Throughput" />
       <StatCard title="Training Iter" value={fedRounds.length > 0 ? `R${fedRounds[fedRounds.length-1].round}` : 'R0'} icon={<Share2 />} subtitle="Local FedAvg State" />
-      <StatCard title="Mesh Uptime" value="14.2d" icon={<RefreshCcw />} subtitle="No Connection Drop" />
+      <StatCard title="Mesh Uptime" value={nodes.length > 0 ? nodes[0].uptime : '0d 0h'} icon={<RefreshCcw />} subtitle="No Connection Drop" />
     </div>
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -898,6 +902,8 @@ const NodesTab: React.FC<{ nodes: NodeStats[]; openTerminal: (id: string) => voi
           status: 'Online',
           cpuUsage: Math.floor(Math.random() * 30) + 10,
           memoryUsage: Math.floor(Math.random() * 40) + 20,
+          ramTotal: 16,
+          ramUsed: 4 + Math.random() * 4,
           temp: Math.floor(Math.random() * 20) + 40,
           nvmeStatus: 'Active',
           uptime: '0d 0h',
@@ -1250,11 +1256,11 @@ const SovereignNodeCard: React.FC<{ node: NodeStats; openTerminal: (id: string) 
       </div>
       <div className="space-y-4">
         <div className="flex justify-between text-[10px] text-slate-500 uppercase font-black tracking-widest">
-          <span>NVMe BANDWIDTH</span>
-          <span className="text-white font-mono">{node.memoryUsage}%</span>
+          <span>RAM USAGE (16GB)</span>
+          <span className="text-white font-mono">{node.ramUsed.toFixed(1)} GB</span>
         </div>
         <div className="w-full h-2 bg-slate-800/50 rounded-full overflow-hidden p-[1px] border border-slate-700/20">
-          <div className="h-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all duration-1000 rounded-full" style={{ width: `${node.memoryUsage}%` }}></div>
+          <div className="h-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)] transition-all duration-1000 rounded-full" style={{ width: `${(node.ramUsed / node.ramTotal) * 100}%` }}></div>
         </div>
       </div>
     </div>
