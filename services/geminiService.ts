@@ -8,16 +8,20 @@ const getAIClient = () => {
 export const analyzeClusterHealth = async (clusterState: any) => {
   const ai = getAIClient();
   const prompt = `
-    Perform a SOVEREIGN ANALYSIS of the following Raspberry Pi 5 Edge Cluster:
+    Perform an ADVANCED SOVEREIGN AUDIT of the following Raspberry Pi 5 Edge Cluster:
     ${JSON.stringify(clusterState, null, 2)}
     
-    The user is running an offline-first, zero-cloud platform. Provide technical optimization recommendations focusing on:
-    1. Federated Learning efficiency and client contribution balance.
-    2. NVMe thermal throttling vs. Model Marketplace sync speeds.
-    3. P2P Mesh network (WireGuard) stability.
-    4. Hardware health (CPU/Temp) and energy consumption.
+    Context:
+    - This is a zero-cloud platform running industrial automation and video analytics.
     
-    Ensure suggestions are purely local (no cloud APIs). Keep response technical and use Markdown.
+    Focus on:
+    1. Video Pipeline Impact: Evaluate FPS stability vs thermal loads on the Agents.
+    2. Automation Safety: Are there conflicting rules in the Edge Automation engine?
+    3. Storage Resilience: Assess the frequency and integrity of Snapshot Vault backups.
+    4. Mesh Load: Determine if P2P sync is impacting inference latency during model updates.
+    
+    Format:
+    Use professional Markdown. Focus on actionable local optimizations.
   `;
 
   try {
@@ -28,9 +32,9 @@ export const analyzeClusterHealth = async (clusterState: any) => {
         thinkingConfig: { thinkingBudget: 0 }
       }
     });
-    return response.text || "Unable to generate sovereign insights at this time.";
+    return response.text || "Sovereign intelligence engine unreachable.";
   } catch (error) {
     console.error("Gemini Analysis Error:", error);
-    return "Analysis failed. Ensure your platform has external gateway access for this specific request or check API configuration.";
+    return "Analysis failed. Ensure the gateway node has temporary upstream access for this specific transaction.";
   }
 };

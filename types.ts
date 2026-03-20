@@ -37,6 +37,14 @@ export interface FederatedRound {
   timestamp: string;
 }
 
+export interface ClientContribution {
+  nodeId: string;
+  accuracy: number;
+  latency: string;
+  samples: number;
+  status: 'Aggregating' | 'Idle' | 'Local-Training';
+}
+
 export interface P2PPeer {
   id: string;
   type: 'Syncthing' | 'IPFS';
@@ -52,6 +60,37 @@ export interface TelemetryData {
   accel: { x: number; y: number; z: number };
 }
 
+export interface AutomationRule {
+  id: string;
+  name: string;
+  trigger: string;
+  action: string;
+  status: 'Active' | 'Paused';
+}
+
+export interface VideoStream {
+  id: string;
+  nodeId: string;
+  status: 'Streaming' | 'Idle' | 'Detection Active';
+  fps: number;
+  resolution: string;
+}
+
+export interface BackupSnapshot {
+  id: string;
+  timestamp: string;
+  size: string;
+  type: 'Full System' | 'Model Weights' | 'Telemetry DB';
+  checksum: string;
+}
+
+export interface AppNotification {
+  id: string;
+  type: 'info' | 'warning' | 'error' | 'success';
+  message: string;
+  timestamp: string;
+}
+
 export enum AppTab {
   DASHBOARD = 'dashboard',
   NODES = 'nodes',
@@ -59,8 +98,12 @@ export enum AppTab {
   FEDERATED = 'federated_learning',
   MARKETPLACE = 'marketplace',
   P2P = 'p2p_sync',
+  VIDEO = 'video_analytics',
+  AUTOMATION = 'edge_automation',
+  BACKUP = 'snapshots',
   TELEMETRY = 'telemetry',
   LOGS = 'logs',
   AI_INSIGHTS = 'ai_insights',
-  SETUP = 'cluster_setup'
+  SETUP = 'cluster_setup',
+  OPENCLAW = 'openclaw'
 }
