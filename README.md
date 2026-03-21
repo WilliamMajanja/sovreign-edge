@@ -23,11 +23,12 @@ The **Sovereign Edge AI Platform** is a production-grade, zero-cloud infrastruct
 | :--- | :--- |
 | **Autonomous Inference** | Local execution of quantized models (ONNX/TFLite) optimized for the Pi 5's Broadcom BCM2712. |
 | **Local LLM (Token-Free)** | Native integration with **Ollama** and **AirLLM** for running 7B to 70B+ parameter models locally. |
+| **Agent Swarm (m.402)** | Decentralized collective of autonomous agents using **L402 (m.402)** micro-payments for resource allocation. |
 | **Federated Learning** | Collaborative model training across multiple nodes without raw data ever leaving the local mesh. |
 | **P2P Model Mesh** | Decentralized distribution and versioning of AI artifacts using Syncthing and IPFS protocols. |
-| **WireGuard Mesh** | Every node is connected via an encrypted, peer-to-peer overlay network. |
+| **Moltbook Port** | Secure, encrypted P2P communication layer for the Agent Cartel and Cabal directives. |
 | **Sovereign AI Audit** | Deep infrastructure reasoning powered by **Gemini 3 Flash** to evaluate cluster stability. |
-| **NVMe-First Storage** | High-speed SSD optimization for rapid model cold-starts and large dataset handling. |
+| **Economic Settlement** | Real-time Mesh Transaction Ledger for automated agent-to-agent resource bidding. |
 
 ---
 
@@ -73,12 +74,14 @@ The dashboard will launch at `http://localhost:3000`. It includes **calibrated m
 
 - **Orchestration**: Lightweight `k3s` (Kubernetes)
 - **Local LLM**: `Ollama` (GGUF) + `AirLLM` (Layer-wise optimization)
+- **Agent Economy**: `m.402` (L402) Lightning-based micro-payments
 - **Networking**: `WireGuard` P2P Mesh + `Calico` CNI
 - **Storage**: `Longhorn` distributed block storage on NVMe
 - **Inference**: `ONNX Runtime` + `Quantized Pipelines`
 - **Learning**: `Flower` / `OpenFL` Federated Learning Frameworks
 - **Observability**: `Prometheus` & `Grafana` (Local-only)
 - **AI Reasoning**: `Gemini 3 Flash` (via @google/genai)
+- **Swarm Protocol**: Reputation-weighted consensus (PoS)
 
 ---
 
