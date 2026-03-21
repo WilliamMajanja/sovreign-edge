@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { NodeStats, FederatedRound, ClientContribution, InferenceMetric, OllamaStatus, AirLLMStatus, ServiceStatus, PrometheusResponse, FlowerRoundResponse, FlowerClientsResponse, ONNXStatsResponse, LocalModel, SwarmTask, AgentSwarmNode, MoltbookMessage, CartelStatus, BackupSnapshot } from '../types';
+import { NodeStats, FederatedRound, ClientContribution, InferenceMetric, OllamaStatus, AirLLMStatus, ServiceStatus, PrometheusResponse, FlowerRoundResponse, FlowerClientsResponse, ONNXStatsResponse, LocalModel, SwarmTask, AgentSwarmNode, MoltbookMessage, CartelStatus, BackupSnapshot, AgentTransaction } from '../types';
 
 export const PROMETHEUS_URL = import.meta.env.VITE_PROMETHEUS_URL || 'http://localhost:9090';
 export const FLOWER_URL = import.meta.env.VITE_FLOWER_URL || 'http://localhost:8080';
@@ -313,9 +313,11 @@ export async function deploySwarmTask(title: string): Promise<SwarmTask | null> 
     return {
       id: `task-${Date.now()}`,
       title,
-      status: 'Processing',
-      assignedTo: ['pi-01', 'pi-02'],
-      priority: 'Medium'
+      status: 'Awaiting-Payment',
+      assignedTo: ['agent-1', 'agent-2'],
+      priority: 'Medium',
+      cost: 402,
+      invoice: `lnbc4020n1p3...`
     };
   }
 }
@@ -328,10 +330,10 @@ export async function fetchSwarmNodes(): Promise<AgentSwarmNode[]> {
   } catch (e) {
     console.warn("Failed to fetch swarm nodes, using mock.", e);
     return [
-      { id: 'agent-1', name: 'Alpha-Agent', role: 'Coordinator', status: 'Active', contribution: 85, lastTask: 'Mesh Audit' },
-      { id: 'agent-2', name: 'Beta-Agent', role: 'Inference', status: 'Thinking', contribution: 42, lastTask: 'LLM Quantization' },
-      { id: 'agent-3', name: 'Gamma-Agent', role: 'Security', status: 'Collaborating', contribution: 78, lastTask: 'Encryption Sync' },
-      { id: 'agent-4', name: 'Delta-Agent', role: 'Storage', status: 'Idle', contribution: 12, lastTask: 'Snapshot Cleanup' },
+      { id: 'agent-1', name: 'Alpha-Agent', role: 'Coordinator', status: 'Active', contribution: 85, lastTask: 'Mesh Audit', walletBalance: 12400, reputation: 98 },
+      { id: 'agent-2', name: 'Beta-Agent', role: 'Inference', status: 'Thinking', contribution: 42, lastTask: 'LLM Quantization', walletBalance: 8500, reputation: 92 },
+      { id: 'agent-3', name: 'Gamma-Agent', role: 'Security', status: 'Collaborating', contribution: 78, lastTask: 'Encryption Sync', walletBalance: 15200, reputation: 99 },
+      { id: 'agent-4', name: 'Delta-Agent', role: 'Storage', status: 'Idle', contribution: 12, lastTask: 'Snapshot Cleanup', walletBalance: 3200, reputation: 85 },
     ];
   }
 }
@@ -344,9 +346,24 @@ export async function fetchSwarmTasks(): Promise<SwarmTask[]> {
   } catch (e) {
     console.warn("Failed to fetch swarm tasks, using mock.", e);
     return [
-      { id: 'task-101', title: 'Optimize Mesh Routing', status: 'Processing', assignedTo: ['agent-1', 'agent-3'], priority: 'High' },
-      { id: 'task-102', title: 'Verify Model Integrity', status: 'Completed', assignedTo: ['agent-2'], priority: 'Medium' },
-      { id: 'task-103', title: 'Distribute Federated Weights', status: 'Pending', assignedTo: ['agent-1', 'agent-2', 'agent-3'], priority: 'Critical' },
+      { id: 'task-101', title: 'Optimize Mesh Routing', status: 'Processing', assignedTo: ['agent-1', 'agent-3'], priority: 'High', cost: 1200 },
+      { id: 'task-102', title: 'Verify Model Integrity', status: 'Completed', assignedTo: ['agent-2'], priority: 'Medium', cost: 800 },
+      { id: 'task-103', title: 'Distribute Federated Weights', status: 'Awaiting-Payment', assignedTo: ['agent-1', 'agent-2', 'agent-3'], priority: 'Critical', cost: 402, invoice: 'lnbc4020n1p3...' },
+    ];
+  }
+}
+
+export async function fetchAgentTransactions(): Promise<AgentTransaction[]> {
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/v1/swarm/transactions`);
+    if (!res.ok) throw new Error('Swarm transactions unreachable');
+    return await res.json();
+  } catch (e) {
+    console.warn("Failed to fetch agent transactions, using mock.", e);
+    return [
+      { id: 'tx-1', from: 'User', to: 'Alpha-Agent', amount: 402, timestamp: '10:45 AM', status: 'Settled', memo: 'Task: Mesh Audit' },
+      { id: 'tx-2', from: 'Alpha-Agent', to: 'Beta-Agent', amount: 150, timestamp: '10:50 AM', status: 'Settled', memo: 'Sub-task: Inference Delegate' },
+      { id: 'tx-3', from: 'User', to: 'Gamma-Agent', amount: 800, timestamp: '11:05 AM', status: 'Pending', memo: 'Task: Security Audit' },
     ];
   }
 }

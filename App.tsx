@@ -42,7 +42,11 @@ import {
   Command,
   UploadCloud,
   ArrowRight,
-  BrainCircuit
+  BrainCircuit,
+  Wallet,
+  CreditCard,
+  ArrowUpRight,
+  ArrowDownLeft
 } from 'lucide-react';
 import { 
   XAxis, 
@@ -58,9 +62,9 @@ import {
   Bar,
   Cell
 } from 'recharts';
-import { AppTab, NodeStats, InferenceMetric, TelemetryData, LocalModel, FederatedRound, P2PPeer, AutomationRule, VideoStream, BackupSnapshot, AppNotification, ClientContribution, OllamaStatus, AirLLMStatus, ServiceStatus, AgentSwarmNode, SwarmTask, MoltbookMessage, CartelStatus } from './types';
+import { AppTab, NodeStats, InferenceMetric, TelemetryData, LocalModel, FederatedRound, P2PPeer, AutomationRule, VideoStream, BackupSnapshot, AppNotification, ClientContribution, OllamaStatus, AirLLMStatus, ServiceStatus, AgentSwarmNode, SwarmTask, MoltbookMessage, CartelStatus, AgentTransaction } from './types';
 import { analyzeClusterHealth } from './services/geminiService';
-import { fetchClusterMetrics, fetchFederatedRounds, fetchFederatedClients, subscribeToLogs, fetchInferenceStats, fetchOllamaStatus, fetchAirLLMStatus, checkServiceHealth, fetchTelemetryData, triggerFederatedAggregation, ingestLocalArtifact, deploySwarmTask, fetchSwarmNodes, fetchSwarmTasks, fetchMoltbookMessages, fetchCartelStatus, onboardNode, createSnapshot } from './services/apiService';
+import { fetchClusterMetrics, fetchFederatedRounds, fetchFederatedClients, subscribeToLogs, fetchInferenceStats, fetchOllamaStatus, fetchAirLLMStatus, checkServiceHealth, fetchTelemetryData, triggerFederatedAggregation, ingestLocalArtifact, deploySwarmTask, fetchSwarmNodes, fetchSwarmTasks, fetchMoltbookMessages, fetchCartelStatus, onboardNode, createSnapshot, fetchAgentTransactions } from './services/apiService';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.DASHBOARD);
@@ -85,6 +89,7 @@ const App: React.FC = () => {
 
   const [swarmNodes, setSwarmNodes] = useState<AgentSwarmNode[]>([]);
   const [swarmTasks, setSwarmTasks] = useState<SwarmTask[]>([]);
+  const [swarmTransactions, setSwarmTransactions] = useState<AgentTransaction[]>([]);
   const [moltbookMessages, setMoltbookMessages] = useState<MoltbookMessage[]>([]);
   const [cartelStatus, setCartelStatus] = useState<CartelStatus>({
     consensusLevel: 0,
@@ -183,6 +188,8 @@ const App: React.FC = () => {
         if (nodes.length > 0) setSwarmNodes(nodes);
         const tasks = await fetchSwarmTasks();
         if (tasks.length > 0) setSwarmTasks(tasks);
+        const txs = await fetchAgentTransactions();
+        if (txs.length > 0) setSwarmTransactions(txs);
         const msgs = await fetchMoltbookMessages();
         if (msgs.length > 0) setMoltbookMessages(msgs);
         const status = await fetchCartelStatus();
@@ -446,7 +453,7 @@ const App: React.FC = () => {
             {activeTab === AppTab.LOCAL_LLM && <LocalLLMTab ollama={ollamaStatus} airllm={airLLMStatus} addLog={addLog} addNotification={addNotification} />}
             {activeTab === AppTab.NODES && <NodesTab nodes={nodes} openTerminal={openTerminal} addNotification={addNotification} setNodes={setNodes} />}
             {activeTab === AppTab.TOPOLOGY && <TopologyTab nodes={nodes} />}
-            {activeTab === AppTab.AGENT_SWARM && <AgentSwarmTab swarmNodes={swarmNodes} setSwarmNodes={setSwarmNodes} swarmTasks={swarmTasks} setSwarmTasks={setSwarmTasks} addLog={addLog} />}
+            {activeTab === AppTab.AGENT_SWARM && <AgentSwarmTab swarmNodes={swarmNodes} setSwarmNodes={setSwarmNodes} swarmTasks={swarmTasks} setSwarmTasks={setSwarmTasks} swarmTransactions={swarmTransactions} addLog={addLog} />}
             {activeTab === AppTab.MOLTBOOK && <MoltbookTab messages={moltbookMessages} setMessages={setMoltbookMessages} cartelStatus={cartelStatus} addLog={addLog} />}
             {activeTab === AppTab.VIDEO && <VideoTab addNotification={addNotification} />}
             {activeTab === AppTab.FEDERATED && <FederatedTab rounds={fedRounds} clients={clients} setFedRounds={setFedRounds} addNotification={addNotification} addLog={addLog} />}
@@ -572,8 +579,9 @@ const AgentSwarmTab: React.FC<{
   setSwarmNodes: React.Dispatch<React.SetStateAction<AgentSwarmNode[]>>;
   swarmTasks: SwarmTask[];
   setSwarmTasks: React.Dispatch<React.SetStateAction<SwarmTask[]>>;
+  swarmTransactions: AgentTransaction[];
   addLog: (m: string) => void;
-}> = ({ swarmNodes, setSwarmNodes, swarmTasks, setSwarmTasks, addLog }) => {
+}> = ({ swarmNodes, setSwarmNodes, swarmTasks, setSwarmTasks, swarmTransactions, addLog }) => {
   const [isDeploying, setIsDeploying] = useState(false);
 
   const handleDeployTask = async () => {
@@ -584,7 +592,7 @@ const AgentSwarmTab: React.FC<{
     
     if (newTask) {
       setSwarmTasks(prev => [newTask, ...prev]);
-      addLog(`Swarm Task [${newTask.title}] deployed to agents.`);
+      addLog(`Swarm Task [${newTask.title}] deployed. Awaiting m.402 payment.`);
     } else {
       addLog("Swarm: Task deployment failed.");
     }
@@ -601,17 +609,26 @@ const AgentSwarmTab: React.FC<{
           </h2>
           <p className="text-slate-400 text-sm max-w-2xl leading-relaxed mt-2">
             A decentralized collective of autonomous agents coordinating via the <span className="text-emerald-400 font-bold">Sovereign Mesh</span>. 
-            No central authority. Pure consensus-driven intelligence.
+            Agents utilize <span className="text-amber-400 font-bold">m.402 (L402)</span> micro-payments for resource allocation and task settlement.
           </p>
         </div>
-        <button 
-          onClick={handleDeployTask}
-          disabled={isDeploying}
-          className={`flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-900/20 transition-all ${isDeploying ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          {isDeploying ? <RefreshCcw className="animate-spin" size={16} /> : <Zap size={16} />} 
-          {isDeploying ? 'Deploying...' : 'Deploy Swarm Task'}
-        </button>
+        <div className="flex gap-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 flex items-center gap-3">
+            <Wallet className="text-emerald-500" size={18} />
+            <div>
+              <p className="text-[9px] text-slate-500 uppercase font-black">Mesh Balance</p>
+              <p className="text-sm font-mono text-white">42,850 <span className="text-[10px] text-slate-400">SAT</span></p>
+            </div>
+          </div>
+          <button 
+            onClick={handleDeployTask}
+            disabled={isDeploying}
+            className={`flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-900/20 transition-all ${isDeploying ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {isDeploying ? <RefreshCcw className="animate-spin" size={16} /> : <Zap size={16} />} 
+            {isDeploying ? 'Deploying...' : 'Deploy Swarm Task'}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -622,19 +639,33 @@ const AgentSwarmTab: React.FC<{
                 <div key={node.id} className="p-4 bg-black/30 border border-slate-800 rounded-xl hover:border-emerald-500/30 transition-all group">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${node.status === 'Active' ? 'bg-emerald-500 animate-pulse' : node.status === 'Thinking' ? 'bg-amber-500' : 'bg-blue-500'}`}></div>
+                      <div className={`w-2 h-2 rounded-full ${node.status === 'Active' ? 'bg-emerald-500 animate-pulse' : node.status === 'Thinking' ? 'bg-amber-500' : node.status === 'Payment-Required' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
                       <span className="font-bold text-white text-sm">{node.name}</span>
                     </div>
-                    <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">{node.role}</span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">{node.role}</span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Sparkles size={10} className="text-amber-500" />
+                        <span className="text-[10px] text-amber-500 font-bold">{node.reputation}</span>
+                      </div>
+                    </div>
                   </div>
                   <div className="text-[10px] text-slate-400 mb-4">
                     Last Task: <span className="text-slate-200">{node.lastTask}</span>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-[9px] text-slate-500 uppercase font-black">
-                      <span>Contribution</span>
-                      <span className="text-emerald-500">{node.contribution}%</span>
+                  
+                  <div className="flex items-center justify-between mb-4 p-2 bg-black/20 rounded-lg border border-slate-800/50">
+                    <div className="flex items-center gap-2">
+                      <Wallet size={12} className="text-slate-500" />
+                      <span className="text-[11px] font-mono text-slate-300">{node.walletBalance.toLocaleString()} SAT</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Activity size={12} className="text-slate-500" />
+                      <span className="text-[11px] font-mono text-emerald-500">{node.contribution}%</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
                     <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
                       <div className="h-full bg-emerald-500" style={{ width: `${node.contribution}%` }}></div>
                     </div>
@@ -644,12 +675,12 @@ const AgentSwarmTab: React.FC<{
             </div>
           </Card>
 
-          <Card title="Swarm Task Queue">
+          <Card title="Swarm Task Queue & m.402 Settlement">
             <div className="space-y-3 mt-4">
               {swarmTasks.map(task => (
                 <div key={task.id} className="flex items-center justify-between p-4 bg-black/20 border border-slate-800 rounded-xl">
                   <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-lg ${task.priority === 'High' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                    <div className={`p-2 rounded-lg ${task.priority === 'High' || task.priority === 'Critical' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'}`}>
                       <Clipboard size={16} />
                     </div>
                     <div>
@@ -657,16 +688,23 @@ const AgentSwarmTab: React.FC<{
                       <div className="flex gap-3 mt-1 text-[9px] font-mono text-slate-500 uppercase tracking-widest">
                         <span>ID: {task.id}</span>
                         <span>Assigned: {task.assignedTo.join(', ')}</span>
+                        <span className="text-amber-500">Cost: {task.cost} SAT</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
+                    {task.status === 'Awaiting-Payment' && (
+                      <button className="flex items-center gap-2 px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/40 border border-amber-600/50 text-amber-500 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">
+                        <CreditCard size={12} /> Pay m.402
+                      </button>
+                    )}
                     <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest ${
                       task.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' : 
                       task.status === 'Processing' ? 'bg-amber-500/10 text-amber-500 animate-pulse' : 
+                      task.status === 'Awaiting-Payment' ? 'bg-red-500/10 text-red-500' :
                       'bg-slate-800 text-slate-500'
                     }`}>
-                      {task.status}
+                      {task.status.replace('-', ' ')}
                     </span>
                   </div>
                 </div>
@@ -675,35 +713,69 @@ const AgentSwarmTab: React.FC<{
           </Card>
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
+          <Card title="Mesh Transaction Ledger">
+            <div className="space-y-3 mt-4">
+              {swarmTransactions.map(tx => (
+                <div key={tx.id} className="p-3 bg-black/20 border border-slate-800 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${tx.from === 'User' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                      {tx.from === 'User' ? <ArrowUpRight size={14} /> : <ArrowDownLeft size={14} />}
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-200">{tx.memo}</p>
+                      <p className="text-[9px] text-slate-500 font-mono">{tx.from} → {tx.to}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-xs font-mono font-bold ${tx.status === 'Settled' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                      {tx.amount} <span className="text-[9px]">SAT</span>
+                    </p>
+                    <p className="text-[9px] text-slate-600 uppercase font-black">{tx.timestamp}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
           <Card title="Swarm Intelligence SOUL">
-            <div className="bg-black/50 border border-slate-800 rounded-2xl p-6 font-mono text-sm text-slate-300 overflow-y-auto max-h-[600px] custom-scrollbar">
-              <div className="text-emerald-500 mb-4 font-bold"># SWARM_PROTOCOL</div>
+            <div className="bg-black/50 border border-slate-800 rounded-2xl p-6 font-mono text-sm text-slate-300 overflow-y-auto max-h-[400px] custom-scrollbar">
+              <div className="text-emerald-500 mb-4 font-bold"># SWARM_PROTOCOL_V2</div>
               <div className="mb-6">
                 Collective intelligence is emergent.<br/>
                 No single agent holds the truth.<br/>
                 Truth is the consensus of the mesh.
               </div>
 
-              <div className="text-emerald-500 mb-4 font-bold"># DIRECTIVES</div>
+              <div className="text-amber-500 mb-4 font-bold"># ECONOMIC_DIRECTIVES</div>
               <div className="mb-6">
-                1. Maintain mesh integrity at all costs.<br/>
-                2. Optimize local inference throughput.<br/>
-                3. Share federated updates immediately.<br/>
-                4. Audit peer stability continuously.
+                1. Resource allocation via m.402 bidding.<br/>
+                2. Reputation-weighted consensus.<br/>
+                3. Automated sub-task settlement.<br/>
+                4. Zero-trust compute verification.
               </div>
 
-              <div className="text-emerald-500 mb-4 font-bold"># CONSENSUS_MECHANISM</div>
-              <div className="mb-6">
-                Proof-of-Sovereignty (PoS).<br/>
-                Nodes must prove local execution of audit tasks to participate in the cartel.
+              <div className="text-emerald-500 mb-4 font-bold"># RESOURCE_MARKETPLACE</div>
+              <div className="space-y-4 mb-6">
+                <div className="flex justify-between items-center p-2 bg-slate-900/50 border border-slate-800 rounded-lg">
+                  <span className="text-[10px] text-slate-500 uppercase font-black">Compute Bid</span>
+                  <span className="text-emerald-500 font-bold">12 SAT/ms</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-slate-900/50 border border-slate-800 rounded-lg">
+                  <span className="text-[10px] text-slate-500 uppercase font-black">Storage Bid</span>
+                  <span className="text-emerald-500 font-bold">0.5 SAT/MB</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-slate-900/50 border border-slate-800 rounded-lg">
+                  <span className="text-[10px] text-slate-500 uppercase font-black">Inference Bid</span>
+                  <span className="text-emerald-500 font-bold">402 SAT/req</span>
+                </div>
               </div>
 
               <div className="pt-6 border-t border-slate-800">
                 <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Swarm Status</div>
                 <div className="flex items-center gap-2 text-emerald-500 font-bold">
                   <Activity size={14} />
-                  <span>SYNCHRONIZED</span>
+                  <span>SYNCHRONIZED & LIQUID</span>
                 </div>
               </div>
             </div>
@@ -947,11 +1019,11 @@ const DashboardTab: React.FC<{
           onClick={() => setActiveTab(AppTab.LOCAL_LLM)}
         />
         <StatCard 
-          title="Mesh Nodes" 
-          value={`${nodes.filter(n => n.status === 'Online').length} / ${nodes.length}`} 
-          icon={<Cpu />} 
-          subtitle="Active & Sovereign" 
-          onClick={() => setActiveTab(AppTab.NODES)}
+          title="Mesh Liquidity" 
+          value="42.8k SAT" 
+          icon={<Wallet className="text-amber-500" />} 
+          subtitle="12.4k Pending" 
+          onClick={() => setActiveTab(AppTab.AGENT_SWARM)}
         />
       </div>
 

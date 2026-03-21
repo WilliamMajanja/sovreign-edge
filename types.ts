@@ -153,17 +153,31 @@ export interface AgentSwarmNode {
   id: string;
   name: string;
   role: string;
-  status: 'Active' | 'Idle' | 'Thinking' | 'Collaborating';
+  status: 'Active' | 'Idle' | 'Thinking' | 'Collaborating' | 'Payment-Required';
   contribution: number;
   lastTask: string;
+  walletBalance: number; // in Satoshis or micro-credits
+  reputation: number; // 0-100
 }
 
 export interface SwarmTask {
   id: string;
   title: string;
-  status: 'Pending' | 'Processing' | 'Completed';
+  status: 'Pending' | 'Processing' | 'Completed' | 'Awaiting-Payment';
   assignedTo: string[];
   priority: 'Low' | 'Medium' | 'High' | 'Critical';
+  cost: number; // m.402 cost
+  invoice?: string; // L402 invoice string
+}
+
+export interface AgentTransaction {
+  id: string;
+  from: string;
+  to: string;
+  amount: number;
+  timestamp: string;
+  status: 'Pending' | 'Settled' | 'Failed';
+  memo: string;
 }
 
 export interface MoltbookMessage {
