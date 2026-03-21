@@ -12,6 +12,13 @@ export interface PrometheusResponse {
   };
 }
 
+export interface ServiceStatus {
+  name: string;
+  status: 'Online' | 'Offline' | 'Warning';
+  endpoint: string;
+  latency?: number;
+}
+
 export interface NodeStats {
   id: string;
   name: string;
@@ -27,6 +34,8 @@ export interface NodeStats {
   encrypted: boolean;
   ramTotal: number; // in GB
   ramUsed: number; // in GB
+  loadAverage?: [number, number, number];
+  diskUsage?: number;
 }
 
 export interface InferenceMetric {
@@ -107,6 +116,19 @@ export interface AppNotification {
   timestamp: string;
 }
 
+export interface OllamaStatus {
+  model: string;
+  status: 'Running' | 'Idle' | 'Loading';
+  vram: string;
+  tokensPerSec: number;
+}
+
+export interface AirLLMStatus {
+  compression: string;
+  memorySaved: string;
+  active: boolean;
+}
+
 export enum AppTab {
   DASHBOARD = 'dashboard',
   NODES = 'nodes',
@@ -122,5 +144,70 @@ export enum AppTab {
   LOGS = 'logs',
   AI_INSIGHTS = 'ai_insights',
   SETUP = 'cluster_setup',
-  OPENCLAW = 'openclaw'
+  AGENT_SWARM = 'agent_swarm',
+  LOCAL_LLM = 'local_llm',
+  MOLTBOOK = 'moltbook'
+}
+
+export interface AgentSwarmNode {
+  id: string;
+  name: string;
+  role: string;
+  status: 'Active' | 'Idle' | 'Thinking' | 'Collaborating';
+  contribution: number;
+  lastTask: string;
+}
+
+export interface SwarmTask {
+  id: string;
+  title: string;
+  status: 'Pending' | 'Processing' | 'Completed';
+  assignedTo: string[];
+  priority: 'Low' | 'Medium' | 'High' | 'Critical';
+}
+
+export interface MoltbookMessage {
+  id: string;
+  sender: string;
+  content: string;
+  timestamp: string;
+  encrypted: boolean;
+  type: 'Broadcast' | 'Direct' | 'Cabal-Directive';
+}
+
+export interface FlowerRoundResponse {
+  round_id: number;
+  metrics: {
+    accuracy: number;
+    loss: number;
+  };
+  num_clients: number;
+  timestamp: string;
+}
+
+export interface FlowerClientsResponse {
+  clients: {
+    client_id: string;
+    local_accuracy: number;
+    latency_ms: number;
+    num_samples: number;
+    status: 'Aggregating' | 'Idle' | 'Local-Training';
+  }[];
+}
+
+export interface ONNXStatsResponse {
+  model_stats: {
+    model_name: string;
+    inference_stats: {
+      success: { count: number };
+      compute_infer: { ns: number };
+    };
+  }[];
+}
+
+export interface CartelStatus {
+  consensusLevel: number;
+  activeDirectives: number;
+  cabalEncryption: 'AES-256-GCM' | 'Quantum-Resistant';
+  integrity: number;
 }

@@ -1,57 +1,78 @@
 # 🛡️ Sovereign Edge AI Platform
 
-> **Own Your AI. Own Your Data. Own Your Future.**
+<div align="center">
+  <img src="https://picsum.photos/seed/sovereign/1200/400" alt="Sovereign Edge Banner" width="100%" style="border-radius: 24px; margin-bottom: 20px;" referrerPolicy="no-referrer" />
 
-The Sovereign Edge AI Platform is a production-grade, zero-cloud infrastructure stack designed to transform a cluster of Raspberry Pi 5 devices into a fully autonomous AI computation powerhouse. It enables enterprise-grade machine learning, federated learning, and sensor fusion locally—with **zero cloud dependency** and uncompromised privacy.
-
----
-
-## 🚀 Key Features
-
-- **Autonomous Inference**: Local execution of quantized models (ONNX/TFLite) optimized for the Pi 5's Broadcom BCM2712.
-- **Federated Learning**: Collaborative model training across multiple nodes without raw data ever leaving the local mesh.
-- **P2P Model Mesh**: Decentralized distribution and versioning of AI artifacts using Syncthing and IPFS protocols.
-- **WireGuard Mesh Networking**: Every node is connected via an encrypted, peer-to-peer overlay network.
-- **Sovereign AI Audit**: Deep infrastructure reasoning powered by Gemini 3 Flash to evaluate cluster stability and model drift.
-- **NVMe-First Storage**: High-speed SSD optimization for rapid model cold-starts and large dataset handling.
-- **Self-Healing Infrastructure**: Automated node recovery, health monitoring, and local log aggregation.
+  [![License](https://img.shields.io/badge/License-Apache%202.0-emerald.svg?style=for-the-badge)](LICENSE)
+  [![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi%205-red.svg?style=for-the-badge)](https://www.raspberrypi.com/products/raspberry-pi-5/)
+  [![Stack](https://img.shields.io/badge/Stack-TypeScript%20%2F%20Vite%20%2F%20Tailwind-blue.svg?style=for-the-badge)](https://vitejs.dev/)
+  [![Security](https://img.shields.io/badge/Security-Zero%20Cloud-black.svg?style=for-the-badge)](SECURITY.md)
+</div>
 
 ---
 
-## 🔌 Hardware Requirements (Recommended)
+### 🌐 **Own Your AI. Own Your Data. Own Your Future.**
+
+The **Sovereign Edge AI Platform** is a production-grade, zero-cloud infrastructure stack designed to transform a cluster of **Raspberry Pi 5** devices into a fully autonomous AI computation powerhouse. Optimized for **Raspbian Trixie (Debian 12)**, it enables enterprise-grade machine learning, federated learning, and **Token-Free Local LLM** execution—with **zero cloud dependency** and uncompromised privacy.
+
+---
+
+## 🚀 Core Capabilities
+
+| Feature | Description |
+| :--- | :--- |
+| **Autonomous Inference** | Local execution of quantized models (ONNX/TFLite) optimized for the Pi 5's Broadcom BCM2712. |
+| **Local LLM (Token-Free)** | Native integration with **Ollama** and **AirLLM** for running 7B to 70B+ parameter models locally. |
+| **Federated Learning** | Collaborative model training across multiple nodes without raw data ever leaving the local mesh. |
+| **P2P Model Mesh** | Decentralized distribution and versioning of AI artifacts using Syncthing and IPFS protocols. |
+| **WireGuard Mesh** | Every node is connected via an encrypted, peer-to-peer overlay network. |
+| **Sovereign AI Audit** | Deep infrastructure reasoning powered by **Gemini 3 Flash** to evaluate cluster stability. |
+| **NVMe-First Storage** | High-speed SSD optimization for rapid model cold-starts and large dataset handling. |
+
+---
+
+## 🔌 Hardware Requirements (Production Grade)
 
 To run the platform at production capacity, we recommend the following per node:
 
-| Component | Specification |
-| :--- | :--- |
-| **SBC** | Raspberry Pi 5 (8GB or 16GB RAM) |
-| **Storage** | M.2 NVMe SSD (256GB+) via NVMe HAT |
-| **Cooling** | Active Cooler or high-performance passive case |
-| **Power** | Official 27W USB-C Power Supply |
-| **Sensors** | Sense HAT (Optional, for telemetry features) |
-| **AI Accel** | Raspberry Pi AI HAT / Coral TPU (Optional) |
+- **SBC**: Raspberry Pi 5 (**16GB RAM preferred**)
+- **OS**: **Raspbian Trixie (64-bit)**
+- **Storage**: M.2 NVMe SSD (512GB+) via NVMe HAT
+- **Cooling**: Active Cooler or high-performance passive case
+- **Power**: Official 27W USB-C Power Supply
+- **AI Accel**: Raspberry Pi AI HAT / Coral TPU (Optional)
 
 ---
 
-## 🛠️ Getting Started
+## 🛠️ Quick Start (Local Dashboard Evaluation)
 
-### 1. Flash the OS
-Install **Ubuntu 24.04 LTS (64-bit)** Server on your Pi 5. Ensure SSH is enabled.
+The dashboard is designed for easy local evaluation. Follow these steps to run the control plane on your development machine:
 
-### 2. Run the Sovereign Bootstrap
-Execute the following command on your primary node to initialize the master control plane:
-
+### 1. Installation
 ```bash
-sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/project-root/bootstrap.sh)"
+git clone https://github.com/project-root/sovereign-edge-ai.git
+cd sovereign-edge-ai
+npm install
 ```
 
-*Note: You can also copy the script directly from the **Cluster Setup** tab in the management dashboard.*
+### 2. Environment Setup
+Create a `.env` file with your Gemini API Key for the Sovereign Audit features:
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+### 3. Development Mode
+```bash
+npm run dev
+```
+The dashboard will launch at `http://localhost:3000`. It includes **calibrated mock data** that simulates a live Raspberry Pi 5 cluster, Ollama inference, and Federated Learning rounds.
 
 ---
 
-## 📊 Technical Stack
+## 📊 Technical Architecture
 
 - **Orchestration**: Lightweight `k3s` (Kubernetes)
+- **Local LLM**: `Ollama` (GGUF) + `AirLLM` (Layer-wise optimization)
 - **Networking**: `WireGuard` P2P Mesh + `Calico` CNI
 - **Storage**: `Longhorn` distributed block storage on NVMe
 - **Inference**: `ONNX Runtime` + `Quantized Pipelines`
@@ -63,7 +84,7 @@ sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/project-root/bootst
 
 ## 🛡️ The Sovereignty Manifesto
 
-In an era of centralized cloud monopolies, the Sovereign Edge AI Platform stands for **Individual and Institutional Autonomy**:
+In an era of centralized cloud monopolies, we stand for **Individual and Institutional Autonomy**:
 
 1. **Privacy as Default**: No data escapes the local mesh unless explicitly configured.
 2. **Zero Dependency**: The system operates indefinitely without an internet connection.
@@ -72,16 +93,16 @@ In an era of centralized cloud monopolies, the Sovereign Edge AI Platform stands
 
 ---
 
-## 📈 Dashboard & UI
+## 🤝 Contributing
 
-The management dashboard provides real-time visualization of:
-- **Mesh Health**: CPU, RAM, and Thermal metrics across all nodes.
-- **Inference Volume**: Throughput and latency tracking for active engines.
-- **Learning Rounds**: Progress of federated training sessions.
-- **Local Logs**: Real-time event stream from the autonomous control plane.
-
----
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📄 License
 
-This project is licensed under the **Apache License 2.0** - see the LICENSE file for details. Built with ❤️ for the edge computing community.
+This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  Built with ❤️ for the edge computing community.
+</div>

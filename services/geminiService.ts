@@ -11,11 +11,11 @@ export const analyzeClusterHealth = async (clusterState: any, logs: string[]) =>
   const prompt = `
     Perform an ADVANCED SOVEREIGN AUDIT of the following Raspberry Pi 5 Edge Cluster:
     
-    CLUSTER METRICS:
+    CLUSTER METRICS (Real-time Prometheus & k3s data):
     ${JSON.stringify(clusterState, null, 2)}
     
-    RECENT LOGS:
-    ${logs.slice(-30).join('\n')}
+    RECENT LOGS (Live WebSocket stream):
+    ${logs.slice(-50).join('\n')}
     
     Context:
     - This is a zero-cloud platform running industrial automation and video analytics on Raspberry Pi 5 nodes (16GB RAM).
@@ -27,10 +27,11 @@ export const analyzeClusterHealth = async (clusterState: any, logs: string[]) =>
     2. Model Drift: Analyze federated learning accuracy and loss trends across rounds.
     3. Security: Review logs for unauthorized access, mesh connection drops, or suspicious P2P activity.
     4. Inference Throughput: Assess if current workloads (inf/sec) are sustainable on edge hardware.
+    5. Resource Efficiency: Check load averages and disk usage across nodes.
     
     Format:
     Use professional Markdown. Focus on actionable local optimizations and immediate alerts.
-    Include a "Sovereign Health Score" (0-100).
+    Include a "Sovereign Health Score: [0-100]" line at the end of the report.
   `;
 
   try {
